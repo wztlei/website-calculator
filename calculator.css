@@ -1,0 +1,99 @@
+body
+{
+	font-size:0px;
+}
+			
+h1
+{
+	 text-align: center; 
+	 color: black; 
+	 font-size: 36px;
+}
+
+button
+{
+	font-size:24px;
+	font-family:"Helvetica";
+	height: 80px;
+	width: 75px;
+	margin: 0px;
+	border-radius:0px;
+	background-color:#DCDCDC;
+	border:1px solid #888888;
+}
+	
+#answer
+{
+	background-color:black;
+	font-family:"Helvetica";
+	height:54px;
+	width:290px;
+	color:white;
+	font-size:44px;
+	text-align:right;
+	padding-top:50px;
+	padding-right:10px;
+	margin:auto;
+
+}
+	
+#add
+{
+	background-color:#F08A24;	
+}
+	
+#subtract
+{
+	background-color:#F08A24;
+}
+
+#multiply
+{
+	background-color:#F08A24;
+}
+
+#divide
+{
+	background-color:#F08A24;
+}
+	
+#equals
+{
+	background-color:#F08A24;
+}
+	
+#zero
+{
+	width: 150px;
+}
+			
+@media screen and (max-width: 480px)
+{
+	h1
+	{
+		font-size: 7.2vw;
+	}
+				
+	button
+	{
+		font-size: 4.8vw;
+		height: 16vw;
+		width: 15vw;
+	}
+
+	#answer
+	{
+		height:10.8vw;
+		width:58vw;
+		font-size:8.8vw;
+		padding-top:10vw;
+		padding-right:2vw;
+	}
+	
+	#zero
+	{
+		width: 30vw;
+	}
+	
+	
+}

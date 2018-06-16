@@ -1,0 +1,475 @@
+// Define global variables that store the state of the calculator
+var num_array_1 = [];
+var num_array_2 = [];
+var operation = "nothing";
+var is_last_press_equals = false;
+var is_last_press_clear = false;
+var num_digits = 0;
+var has_decimal = false;
+
+
+// Function that calculates the answer to an operation
+// Returns the number as a string
+function calc_answer()
+{
+	var num_1, num_2, answer;
+
+	// Only operate if there exists two numbers to operate on
+	// If the num_array_2 is filled, then the num_array_1 must also be filled
+	if (num_array_2.length > 0)
+	{
+		// Convert the array into a floating point number
+		num_1 = parseFloat(array_to_string(num_array_1));
+		num_2 = parseFloat(array_to_string(num_array_2));
+	}
+	
+	// Check which operation to perform and record the answer into the variable "answer"
+	if (operation == "addition")
+	{
+		answer = num_1 + num_2;
+	}
+	else if (operation == "subtraction")
+	{
+		answer = num_1 - num_2;
+	}
+	else if (operation == "multiplication")
+	{
+		answer = num_1 * num_2;
+	}
+	else if (operation == "division")
+	{
+		answer = num_1 / num_2;
+
+		if (num_2 == 0)
+		{
+			return "Error";
+		}
+	}
+	
+	// Return error if the final answer is too big or too small
+	if (answer > 999999999 || answer < -99999999)
+	{
+		return "Error";
+	}
+
+	// Convert the floating point number to a string
+	answer = answer.toString();
+	
+	// The answer string may need to be shortened to keep its length at 9 or less digits 
+	// (decimals don't count)
+	if (answer.length > 9)
+	{
+		answer = shorten_decimal(answer);
+	}
+
+	return answer;
+}
+
+// Function that is called once the percent button is pressed
+function press_percent()
+{
+	// Check that there are two numbers to operate on
+	if (num_array_2.length > 0)
+	{
+		var is_error = false;
+
+		// The percent operation is actually multiplication, but the second number needs to converted
+		var num_2;
+
+		// 100 + 40% = 100 * (40/100 + 1) = 100 * 1.4 = 140
+		// This "if block" makes num_2 = 1.4 in this example
+		if (operation == "addition")
+		{
+			num_2 = parseFloat(array_to_string(num_array_2)) / 100 + 1;
+		}
+		// 100 - 40% = 100 * (1- 40/100) = 100 * 0.6 = 60
+		// This "if block" makes num_2 = 0.6 in this example
+		else if (operation == "subtraction")
+		{
+			num_2 = 1 - parseFloat(array_to_string(num_array_2)) / 100;
+		}
+		// 100 * 40% = 100 * (40/100) = 100 * 0.4 = 40
+		// This "if block" makes num_2 = 0.4 in this example
+		else if (operation == "multiplication")
+		{
+			num_2 = parseFloat(array_to_string(num_array_2)) / 100;
+		}
+		// 100 / 40% = 100 * (100/40) = 100 * 2.5 = 250
+		// This "if block" makes num_2 = 2.5 in this example
+		else if (operation == "division")
+		{
+			if (parseFloat(array_to_string(num_array_2)) == 0)
+			{
+				is_error = true;
+			}
+			else
+			{
+				num_2 = 100 / parseFloat(array_to_string(num_array_2));
+			}
+		}
+
+		// Update num_array_2 with the converted num_2
+		num_array_2 = string_to_array(num_2.toString());
+
+		if (!is_error)
+		{
+			// Change the operation to multiplication and calculate the answer
+			operation = "multiplication";
+			document.getElementById("answer").innerHTML = calc_answer();
+
+
+			// Assign the answer to the num_array_1
+			num_array_1 = string_to_array(calc_answer());
+		}
+		else
+		{
+			document.getElementById("answer").innerHTML = "Error";
+			num_array_1 = [];
+		}
+		
+		num_array_2 = [];
+
+		// Update the other variables that store the state of the calculator
+		operation = "nothing";
+		is_last_press_equals = true;
+		is_last_press_clear = false;
+		num_digits = 0;
+		has_decimal = false;	
+	}
+}
+
+// Function that is called when the equals sign is pressed
+function press_equals()
+{
+	// Check that the second number is defined
+	// This is only true if both numbers and an operation are defined
+	if (num_array_2.length > 0)
+	{
+		// Calculate answer
+		document.getElementById("answer").innerHTML = calc_answer();
+	
+		// Update the two number arrays 
+		// by assigning the answer to the num_array_1 and erasing num_array_2
+		num_array_1 = string_to_array(calc_answer());
+		num_array_2 = [];
+
+		// Update the other variables that store the state of the calculator
+		operation = "nothing";
+		has_decimal = false;
+		num_digits = 0;
+		is_last_press_equals = true;
+		is_last_press_clear = false;
+		document.getElementById("clear").innerHTML = "C";	
+	}
+}
+
+// Function that truncates the extra digits at the end of a string to keep it under 9 digits long
+function shorten_decimal(long_string)
+{
+	var short_string = "";
+	var digits = 0;
+
+	// Loop through the entire longer string
+	for (var i = 0; i < long_string.length; i++)
+	{
+		// Increment "digits" if a digit is found in long_string
+		if (!isNaN(long_string[i]))
+		{
+			digits++;
+		}
+		
+		// Stop looping and return if the number of digits has exceeded the limit of 9
+		if (digits > 9)
+		{
+			return short_string;
+		}
+		// If the limit has not been exceeded, add the character at the i-th place onto short_string
+		else
+		{
+			short_string += long_string[i];
+		}
+	}
+	
+	// Returns the short_string if there are 9 or less digits
+	return short_string;
+}
+
+// Function that is called when an addition, subtraction, multiplication, or division sign is pressed
+function press_operation(operation_code)
+{
+	// Compute an answer if the second number is defined and update the number arrays
+	if (num_array_2.length > 0)
+	{
+		document.getElementById("answer").innerHTML = calc_answer();
+		num_array_1 = array_to_string(calc_answer());
+		num_array_2 = [];	
+	}
+
+	// Reset the variables storing the calculator's state
+	has_decimal = false;
+	num_digits = 0;
+	is_last_press_equals = false;
+	is_last_press_clear = false;
+
+	// Reset the clear button, since a non-clear button was pressed
+	document.getElementById("clear").innerHTML = "C";	
+
+	// Update the operation that is impending by checking the operation code parameter
+	if (operation_code == 1)
+	{
+		operation = "addition";
+	}
+	else if (operation_code == 2)
+	{
+		operation = "subtraction";
+	}
+	else if (operation_code == 3)
+	{
+		operation = "multiplication";
+	}
+	else if (operation_code == 4)
+	{
+		operation = "division";
+	}
+	
+	// Set the first number to 0 as a default if it is initially undefined
+	if (num_array_1.length == 0)
+	{
+		num_array_1.push(0);
+	}
+}
+
+// Function that adds a digit onto a number array
+function add_digit (input)
+{
+	// Reset the first number and begin a new operation if the equals sign was just pressed
+	// FYI, the num_array_2 was already reset in the function press_equals()
+	if (is_last_press_equals)
+	{
+		num_array_1 = [];
+		is_last_press_equals = false;
+	}
+
+	var new_array = get_correct_array();
+
+	// Only add another digit if the number of digits is less than 9
+	if (num_digits < 9 && !(input == 0 && new_array.length == 1 && new_array[0] == 0))
+	{
+		// Increment the number of digits
+		num_digits++;
+		
+		// Clear out the array if the first and only digit is 0
+		if (new_array.length == 1 && new_array[0] == 0)
+		{
+			new_array = [];
+		}
+
+		// Update the correct array
+		new_array.push(input);
+		change_correct_array(new_array);
+
+		is_last_press_clear = false;
+
+		// Update the clear button and the display screen
+		document.getElementById("clear").innerHTML = "C";	
+		output_array();
+	}
+
+}
+
+// Function that is called when the decimal button is pressed
+function add_decimal ()
+{
+	// Only add a decimal if the number does not already have a decimal
+	if (!has_decimal)
+	{	
+		// Update some variables storing the calculator's state and the clear button
+		has_decimal = true;
+		is_last_press_clear = false;
+		document.getElementById("clear").innerHTML = "C";	
+
+		// If the last button pressed was the equal sign, then reset the first number and add a zero
+		if (is_last_press_equals)
+		{
+			num_array_1 = [0];
+			is_last_press_equals = false;
+		}
+
+		// Add a decimal point onto the correct number array and update the display screen
+		var new_array = get_correct_array();
+		new_array.push(".");
+		change_correct_array(new_array);
+		output_array();
+	}
+}
+
+// Function that is called then the negate button (+/-) is pressed
+function press_negate ()
+{
+	// Get the correct array
+	var new_array = get_correct_array();
+
+	// Reset clear button
+	is_last_press_clear = false;
+	document.getElementById("clear").innerHTML = "C";	
+
+	// If the number is negative, remove the negative sign
+	if (new_array[0] == "-")
+	{
+		// This method was used since "new_array.splice(0, 1)" did not work
+
+		var temp = [];
+
+		// Push every array element except for the first element (a negative sign) onto temp
+		for (var i = 1; i < new_array.length; i++)
+		{
+			temp.push(new_array[i]);
+		}
+
+		// Update new_array with the temporary array that has its negative sign removed
+		new_array = temp;
+	}
+	// The number is assumed to be positive, so a negative sign is added
+	// The new_array must be defined though, so the if statement catches this edge case
+	else if (new_array.length > 0)
+	{
+		// Create a temporary array with the first element as a negative sign
+		var temp = ["-"];
+
+		// Push all the other array elements onto the temporary array
+		for (var i = 0; i < new_array.length; i++)
+		{
+			temp.push(new_array[i]);
+		}
+	
+		// Update new_array
+		new_array = temp;
+	}
+
+	// Change the correct array and update the display screen
+	change_correct_array(new_array);
+	output_array();
+}
+
+// Function that updates the display screen
+function output_array ()
+{	
+	// Get the correct number array to output
+	var array = get_correct_array();
+	
+	// If the number_array is undefined, then output a 0
+	if (array.length == 0)
+	{
+		document.getElementById("answer").innerHTML = 0;
+	}
+	// Otherwise, convert the number array into a string and output
+	else
+	{
+		document.getElementById("answer").innerHTML = array_to_string(array);
+	}
+}
+
+// Function that returns the correct number array to manipulate or output
+function get_correct_array ()
+{
+	// If there is no impending operation, return the first number array
+	if (operation == "nothing")
+	{
+		return num_array_1;
+	}
+	// Otherwise, there is an operation impending and the second number array is returned
+	else
+	{
+		return num_array_2;
+	}
+}
+
+// Function that updates the number array
+function change_correct_array (new_array)
+{
+	// If there is no impending operation, assign new_array to the first number array
+	if (operation == "nothing")
+	{
+		num_array_1 = new_array;
+	}
+	// If there is an impending operation, assign new_array to the second number array
+	else
+	{
+		num_array_2 = new_array;
+	}
+}
+
+// Function that converts an array into a string, which is returned
+function array_to_string(array)
+{
+	var output_string = "";
+	
+	// Iterate through all of the array elements and add them onto the string
+	for (var i = 0; i < array.length; i++)
+	{
+		output_string += array[i];
+	}
+
+	return output_string;
+}
+
+// Function that converts an string into a array, which is returned
+function string_to_array(string)
+{
+	var output_array = [];
+
+	// Iterate through all of the string's characters and push them onto the array
+	for (var i = 0; i < string.length; i++)
+	{
+		output_array.push(string[i]);
+	}
+
+	return output_array;
+}
+
+// Function that is called when the clear button is pressed
+function press_clear ()
+{
+	var should_output = true;
+
+	// Don't output if the array that is being cleared is already undefined
+	if (get_correct_array().length == 0)
+	{
+		should_output = false;
+	}
+
+	// Clear the number array regardless
+	change_correct_array([]);
+	
+	// Update the variables storing the calculator's state
+	has_decimal = false;
+	num_digits = 0;
+	is_last_press_equals = false;
+
+	// If the last button that was pressed was the clear button, do a hard clear (reset everything)
+	if (is_last_press_clear)
+	{
+		// Reset the first number array and the operation, that may not have been reset previously
+		num_array_1 = [];
+		operation = "nothing";
+	
+		// Reset the clear button
+		document.getElementById("clear").innerHTML = "C";	
+		is_last_press_clear = false;
+
+		// Update the display screen
+		output_array();
+	}
+	// Prepare for a hard clear
+	else
+	{
+		document.getElementById("clear").innerHTML = "AC";
+		is_last_press_clear = true;
+	}
+
+	// Outputs only if it has been previously determined that the program should output
+	if (should_output)
+	{
+		output_array();
+	}
+}

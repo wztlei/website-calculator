@@ -1,0 +1,56 @@
+<html>
+	<head>
+		<title>A Simple Calculator</title>
+
+		<link type = "text/css" rel = "stylesheet" href = "calculator.css">
+
+		<script src = "calculator.js"> </script>
+	</head>
+
+	<body>
+		<h1>A Simple Calculator</h1>
+		
+		<div id = "answer">
+			0
+		</div>
+
+		<div align = "center">
+			<button onclick = "press_clear()" id = "clear"> C </button> 
+			<button onclick = "press_negate()"> +/- </button> 
+			<button onclick = "press_percent()"> % </button> 
+			<button onclick = "press_operation(4)" id = "divide"> &divide </button> 		
+		</div>
+
+		<div align = "center">
+			<button onclick = "add_digit(7)"> 7 </button> 
+			<button onclick = "add_digit(8)"> 8 </button>
+			<button onclick = "add_digit(9)"> 9 </button>
+			<button onclick = "press_operation(3)" id = "multiply"> &times </button> 
+		</div>	
+
+		<div align = "center">
+			<button onclick = "add_digit(4)"> 4 </button> 
+			<button onclick = "add_digit(5)"> 5 </button>
+			<button onclick = "add_digit(6)"> 6 </button>
+			<button onclick = "press_operation(2)" id = "subtract"> - </button> 
+		</div>	
+
+		<div align = "center">
+			<button onclick = "add_digit(1)"> 1 </button> 
+			<button onclick = "add_digit(2)"> 2 </button>
+			<button onclick = "add_digit(3)"> 3 </button>
+			<button onclick = "press_operation(1)" id = "add"> + </button> 
+		</div>	
+			
+
+		<div align = "center">	
+			<button onclick = "add_digit(0)" id = "zero"> 0 </button> 
+			<button onclick = "add_decimal()"> . </button> 
+			<button onclick = "press_equals()"id = "equals"> = </button>
+		</div>	
+
+		<p style = "text-align:center; font-size:12"> 
+			Note: This does not follow the order of operations.
+		</p>
+	</body>
+</html>
